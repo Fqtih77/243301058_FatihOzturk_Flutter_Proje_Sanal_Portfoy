@@ -1,17 +1,16 @@
-# sanal_portfoy
+# Sanal Yatırım Portföy Takip Sistemi
 
-A new Flutter project.
+Bu proje, Mobil Programlama ve Veri Tabanı Yönetim Sistemleri dersleri için geliştirilmiştir.[cite: 1, 3]
 
-## Getting Started
+**Öğrenci Bilgileri:**
+- **Ad Soyad:** Fatih Öztürk
+- **Numara:** 243301058
 
-This project is a starting point for a Flutter application.
+**Kullanılan Teknolojiler:**
+- Flutter & Dart
+- Firebase (Auth & Firestore)
+- Riverpod (State Management)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**Test Hesapları:**
+- **User:** user@test.com / 123456[cite: 1, 4]
+- **Admin:** admin@test.com / 123456[cite: 1, 4]
