@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../saglayicilar/saglayicilar.dart';
 import 'kayit_ekrani.dart';
+import 'sifremi_unuttum_ekrani.dart';
 
 class GirisEkrani extends ConsumerStatefulWidget {
   const GirisEkrani({super.key});
@@ -55,121 +56,172 @@ class _GirisEkraniState extends ConsumerState<GirisEkrani> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF3949AB), Color(0xFF1A237E)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            padding: EdgeInsets.fromLTRB(
-              24,
-              MediaQuery.of(context).padding.top + 48,
-              24,
-              40,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.show_chart, color: Colors.white, size: 32),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Sanal Portföy',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Hesabınıza giriş yapın',
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF3949AB), Color(0xFF1A237E)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Form(
-                key: _formAnahtar,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 4,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _emailKontrolcu,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'E-posta',
-                        prefixIcon: Icon(Icons.email_outlined),
+                    Container(
+                      width: 84,
+                      height: 84,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          width: 1.5,
+                        ),
                       ),
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'E-posta giriniz' : null,
+                      child: const Icon(
+                        Icons.show_chart,
+                        color: Colors.white,
+                        size: 42,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _sifreKontrolcu,
-                      obscureText: !_sifreGoster,
-                      decoration: InputDecoration(
-                        labelText: 'Şifre',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _sifreGoster ? Icons.visibility_off : Icons.visibility,
-                          ),
-                          onPressed: () =>
-                              setState(() => _sifreGoster = !_sifreGoster),
-                        ),
-                      ),
-                      validator: (v) =>
-                          v == null || v.length < 6 ? 'En az 6 karakter giriniz' : null,
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _yukleniyor ? null : _girisYap,
-                        child: _yukleniyor
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('Giriş Yap'),
+                    const Text(
+                      'Sanal Portföy',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const KayitEkrani()),
-                        ),
-                        child: const Text('Hesabın yok mu? Kayıt ol'),
-                      ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Portföy Takip Sistemi',
+                      style: TextStyle(color: Colors.white60, fontSize: 13),
                     ),
                   ],
                 ),
               ),
-            ),
+              Expanded(
+                flex: 6,
+                child: Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.93),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Form(
+                    key: _formAnahtar,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Giriş Yap',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1C1C1E),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Hesabınıza erişmek için giriş yapın',
+                          style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _emailKontrolcu,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: const InputDecoration(
+                            labelText: 'E-posta',
+                            prefixIcon: Icon(Icons.email_outlined),
+                          ),
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'E-posta giriniz' : null,
+                        ),
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _sifreKontrolcu,
+                          obscureText: !_sifreGoster,
+                          decoration: InputDecoration(
+                            labelText: 'Şifre',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _sifreGoster
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _sifreGoster = !_sifreGoster),
+                            ),
+                          ),
+                          validator: (v) => v == null || v.length < 6
+                              ? 'En az 6 karakter giriniz'
+                              : null,
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _yukleniyor ? null : _girisYap,
+                            child: _yukleniyor
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Giriş Yap'),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const SifremiUnuttumEkrani()),
+                            ),
+                            child: const Text('Şifremi Unuttum'),
+                          ),
+                        ),
+                        const Spacer(),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const KayitEkrani()),
+                            ),
+                            child: const Text('Hesabın yok mu? Kayıt ol'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

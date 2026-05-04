@@ -31,6 +31,10 @@ class AuthServisi {
     return sonuc;
   }
 
+  Future<void> sifreSifirla(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
   Future<void> cikisYap() async {
     final uid = _auth.currentUser?.uid;
     if (uid != null) await _logServisi.logKaydet(uid, 'Çıkış yapıldı');
