@@ -1,6 +1,6 @@
 # Sanal Yatırım Portföy Takip Sistemi
 
-Bu proje, Mobil Programlama ve Veri Tabanı Yönetim Sistemleri dersleri için geliştirilmiştir.[cite: 1, 3]
+Bu proje, Mobil Programlama ve Veri Tabanı Yönetim Sistemleri dersleri için geliştirilmiştir.
 
 **Öğrenci Bilgileri:**
 - **Ad Soyad:** Fatih Öztürk
@@ -12,5 +12,5 @@ Bu proje, Mobil Programlama ve Veri Tabanı Yönetim Sistemleri dersleri için g
 - Riverpod (State Management)
 
 **Test Hesapları:**
-- **User:** user@test.com / 123456[cite: 1, 4]
-- **Admin:** admin@test.com / 123456[cite: 1, 4]
+- **User:** user@test.com / 123456
+- **Admin:** admin@test.com / 123456
