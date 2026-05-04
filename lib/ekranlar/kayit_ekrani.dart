@@ -15,6 +15,7 @@ class _KayitEkraniState extends ConsumerState<KayitEkrani> {
   final _emailKontrolcu = TextEditingController();
   final _sifreKontrolcu = TextEditingController();
   bool _yukleniyor = false;
+  bool _sifreGoster = false;
 
   @override
   void dispose() {
@@ -68,7 +69,7 @@ class _KayitEkraniState extends ConsumerState<KayitEkrani> {
                 controller: _adKontrolcu,
                 decoration: const InputDecoration(
                   labelText: 'Ad Soyad',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person_outline),
                 ),
                 validator: (v) =>
                     v == null || v.isEmpty ? 'Ad giriniz' : null,
@@ -79,7 +80,7 @@ class _KayitEkraniState extends ConsumerState<KayitEkrani> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'E-posta',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email_outlined),
                 ),
                 validator: (v) =>
                     v == null || v.isEmpty ? 'E-posta giriniz' : null,
@@ -87,10 +88,17 @@ class _KayitEkraniState extends ConsumerState<KayitEkrani> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _sifreKontrolcu,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: !_sifreGoster,
+                decoration: InputDecoration(
                   labelText: 'Şifre',
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _sifreGoster ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () =>
+                        setState(() => _sifreGoster = !_sifreGoster),
+                  ),
                 ),
                 validator: (v) =>
                     v == null || v.length < 6 ? 'En az 6 karakter giriniz' : null,
@@ -104,7 +112,10 @@ class _KayitEkraniState extends ConsumerState<KayitEkrani> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Text('Kayıt Ol'),
                 ),
