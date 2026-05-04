@@ -44,3 +44,19 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .claude/
+
+# Claude Code
+.claudeignore
+CLAUDE.md
+
+# CocoaPods
+ios/Pods/
+macos/Pods/
+ios/Podfile.lock
+
+# Android local config & credentials
+android/local.properties
+android/app/google-services.json
+
+# Firebase cache
+.firebase/
