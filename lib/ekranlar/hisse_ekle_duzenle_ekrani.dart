@@ -21,6 +21,7 @@ class _HisseEkleDuzenleEkraniState
   late final TextEditingController _adetKontrolcu;
   late final TextEditingController _alisKontrolcu;
   late final TextEditingController _guncelKontrolcu;
+  late DateTime _secilenTarih;
   bool _yukleniyor = false;
 
   bool get _duzenlemeModunda => widget.mevcutHisse != null;
@@ -29,6 +30,7 @@ class _HisseEkleDuzenleEkraniState
   void initState() {
     super.initState();
     final h = widget.mevcutHisse;
+    _secilenTarih = h?.alisTarihi ?? DateTime.now();
     _sembolKontrolcu = TextEditingController(text: h?.sembol ?? '');
     _sirketAdiKontrolcu = TextEditingController(text: h?.sirketAdi ?? '');
     _adetKontrolcu =
@@ -49,6 +51,16 @@ class _HisseEkleDuzenleEkraniState
     super.dispose();
   }
 
+  Future<void> _tarihSec() async {
+    final secilen = await showDatePicker(
+      context: context,
+      initialDate: _secilenTarih,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (secilen != null) setState(() => _secilenTarih = secilen);
+  }
+
   Future<void> _kaydet() async {
     if (!_formAnahtar.currentState!.validate()) return;
     setState(() => _yukleniyor = true);
@@ -61,7 +73,7 @@ class _HisseEkleDuzenleEkraniState
       adet: double.parse(_adetKontrolcu.text.replaceAll(',', '.')),
       alisFiyati: double.parse(_alisKontrolcu.text.replaceAll(',', '.')),
       guncelFiyat: double.parse(_guncelKontrolcu.text.replaceAll(',', '.')),
-      alisTarihi: widget.mevcutHisse?.alisTarihi ?? DateTime.now(),
+      alisTarihi: _secilenTarih,
     );
 
     try {
@@ -84,12 +96,15 @@ class _HisseEkleDuzenleEkraniState
 
   @override
   Widget build(BuildContext context) {
+    final tarihMetin =
+        '${_secilenTarih.day.toString().padLeft(2, '0')}.${_secilenTarih.month.toString().padLeft(2, '0')}.${_secilenTarih.year}';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_duzenlemeModunda ? 'Hisse Düzenle' : 'Hisse Ekle'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formAnahtar,
           child: Column(
@@ -99,29 +114,29 @@ class _HisseEkleDuzenleEkraniState
                 textCapitalization: TextCapitalization.characters,
                 decoration: const InputDecoration(
                   labelText: 'Sembol (örn: THYAO)',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.tag),
                 ),
                 validator: (v) =>
                     v == null || v.isEmpty ? 'Sembol giriniz' : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: _sirketAdiKontrolcu,
                 decoration: const InputDecoration(
                   labelText: 'Şirket Adı',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.business_outlined),
                 ),
                 validator: (v) =>
                     v == null || v.isEmpty ? 'Şirket adı giriniz' : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: _adetKontrolcu,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Adet',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.numbers),
                 ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Adet giriniz';
@@ -131,14 +146,14 @@ class _HisseEkleDuzenleEkraniState
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: _alisKontrolcu,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Alış Fiyatı (₺)',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.price_change_outlined),
                 ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Alış fiyatı giriniz';
@@ -148,14 +163,14 @@ class _HisseEkleDuzenleEkraniState
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: _guncelKontrolcu,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Güncel Fiyat (₺)',
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.update),
                 ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Güncel fiyat giriniz';
@@ -165,7 +180,20 @@ class _HisseEkleDuzenleEkraniState
                   return null;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
+              InkWell(
+                onTap: _tarihSec,
+                borderRadius: BorderRadius.circular(12),
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Alış Tarihi',
+                    prefixIcon: Icon(Icons.calendar_today_outlined),
+                    suffixIcon: Icon(Icons.arrow_drop_down),
+                  ),
+                  child: Text(tarihMetin),
+                ),
+              ),
+              const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -174,8 +202,8 @@ class _HisseEkleDuzenleEkraniState
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child:
-                              CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : Text(_duzenlemeModunda ? 'Güncelle' : 'Ekle'),
                 ),
