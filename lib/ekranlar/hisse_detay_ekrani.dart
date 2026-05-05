@@ -12,7 +12,8 @@ class HisseDetayEkrani extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final kar = hisse.karZarar >= 0;
-    final karRenk = kar ? const Color(0xFF2E7D32) : const Color(0xFFC62828);
+    final karRenk =
+        kar ? const Color(0xFF2E7D32) : const Color(0xFFC62828);
     final karArkaPlan = kar
         ? const Color(0xFF4CAF50).withValues(alpha: 0.1)
         : const Color(0xFFEF5350).withValues(alpha: 0.1);
@@ -26,7 +27,8 @@ class HisseDetayEkrani extends ConsumerWidget {
             onPressed: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => HisseEkleDuzenleEkrani(mevcutHisse: hisse),
+                builder: (_) =>
+                    HisseEkleDuzenleEkrani(mevcutHisse: hisse),
               ),
             ),
           ),
@@ -36,8 +38,15 @@ class HisseDetayEkrani extends ConsumerWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF3949AB),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.update),
+        label: const Text('Fiyat Güncelle'),
+        onPressed: () => _fiyatGuncelleDialog(context, ref),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -50,7 +59,8 @@ class HisseDetayEkrani extends ConsumerWidget {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3949AB).withValues(alpha: 0.1),
+                        color: const Color(0xFF3949AB)
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Center(
@@ -99,12 +109,10 @@ class HisseDetayEkrani extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                'BIST',
-                                style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 12),
-                              ),
+                              Text('BIST',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 12)),
                             ],
                           ),
                         ],
@@ -117,11 +125,13 @@ class HisseDetayEkrani extends ConsumerWidget {
             const SizedBox(height: 12),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                  vertical: 20, horizontal: 16),
               decoration: BoxDecoration(
                 color: karArkaPlan,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: karRenk.withValues(alpha: 0.25)),
+                border: Border.all(
+                    color: karRenk.withValues(alpha: 0.25)),
               ),
               child: Column(
                 children: [
@@ -186,23 +196,17 @@ class HisseDetayEkrani extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Yatırım Özeti',
-                      style: TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
+                    const Text('Yatırım Özeti',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
-                    _OzetSatir(
-                      'Toplam Maliyet',
-                      '₺${hisse.toplamMaliyet.toStringAsFixed(2)}',
-                      null,
-                    ),
+                    _OzetSatir('Toplam Maliyet',
+                        '₺${hisse.toplamMaliyet.toStringAsFixed(2)}',
+                        null),
                     const Divider(height: 20),
-                    _OzetSatir(
-                      'Toplam Değer',
-                      '₺${hisse.toplamDeger.toStringAsFixed(2)}',
-                      null,
-                    ),
+                    _OzetSatir('Toplam Değer',
+                        '₺${hisse.toplamDeger.toStringAsFixed(2)}', null),
                     const Divider(height: 20),
                     _OzetSatir(
                       'Net Kar / Zarar',
@@ -217,6 +221,57 @@ class HisseDetayEkrani extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _fiyatGuncelleDialog(
+      BuildContext context, WidgetRef ref) async {
+    final kontrolcu = TextEditingController(
+        text: hisse.guncelFiyat.toStringAsFixed(2));
+
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('${hisse.sembol} Fiyat Güncelle'),
+        content: TextField(
+          controller: kontrolcu,
+          keyboardType:
+              const TextInputType.numberWithOptions(decimal: true),
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Güncel Fiyat (₺)',
+            prefixIcon: Icon(Icons.price_change_outlined),
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('İptal')),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Güncelle')),
+        ],
+      ),
+    );
+
+    if (onay == true && context.mounted) {
+      final yeniFiyat =
+          double.tryParse(kontrolcu.text.replaceAll(',', '.'));
+      if (yeniFiyat != null && yeniFiyat > 0) {
+        final guncellenmis = HisseModeli(
+          id: hisse.id,
+          sembol: hisse.sembol,
+          sirketAdi: hisse.sirketAdi,
+          adet: hisse.adet,
+          alisFiyati: hisse.alisFiyati,
+          guncelFiyat: yeniFiyat,
+          alisTarihi: hisse.alisTarihi,
+        );
+        await ref
+            .read(firestoreServisSaglayici)
+            .hisseDuzenle(guncellenmis);
+        if (context.mounted) Navigator.pop(context);
+      }
+    }
   }
 
   Future<void> _silmeOnayi(BuildContext context, WidgetRef ref) async {
@@ -250,13 +305,16 @@ class _StatKutu extends StatelessWidget {
   final String deger;
 
   const _StatKutu(
-      {required this.ikon, required this.baslik, required this.deger});
+      {required this.ikon,
+      required this.baslik,
+      required this.deger});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
             Icon(ikon, size: 20, color: const Color(0xFF3949AB)),
@@ -297,8 +355,8 @@ class _OzetSatir extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(baslik,
-            style:
-                const TextStyle(color: Color(0xFF6B7280), fontSize: 14)),
+            style: const TextStyle(
+                color: Color(0xFF6B7280), fontSize: 14)),
         Text(deger,
             style: TextStyle(
                 fontWeight: FontWeight.w600,

@@ -16,19 +16,33 @@ class PortfoyEkrani extends ConsumerStatefulWidget {
 
 class _PortfoyEkraniState extends ConsumerState<PortfoyEkrani> {
   _Siralama _siralama = _Siralama.deger;
+  final _aramaKontrolcu = TextEditingController();
+  String _aramaMetni = '';
 
-  List<HisseModeli> _sirala(List<HisseModeli> liste) {
-    final kopi = [...liste];
+  @override
+  void dispose() {
+    _aramaKontrolcu.dispose();
+    super.dispose();
+  }
+
+  List<HisseModeli> _isle(List<HisseModeli> liste) {
+    var sonuc = liste.where((h) {
+      if (_aramaMetni.isEmpty) return true;
+      final q = _aramaMetni.toLowerCase();
+      return h.sembol.toLowerCase().contains(q) ||
+          h.sirketAdi.toLowerCase().contains(q);
+    }).toList();
+
     switch (_siralama) {
       case _Siralama.deger:
-        kopi.sort((a, b) => b.toplamDeger.compareTo(a.toplamDeger));
+        sonuc.sort((a, b) => b.toplamDeger.compareTo(a.toplamDeger));
       case _Siralama.kar:
-        kopi.sort(
+        sonuc.sort(
             (a, b) => b.karZararYuzdesi.compareTo(a.karZararYuzdesi));
       case _Siralama.ad:
-        kopi.sort((a, b) => a.sembol.compareTo(b.sembol));
+        sonuc.sort((a, b) => a.sembol.compareTo(b.sembol));
     }
-    return kopi;
+    return sonuc;
   }
 
   @override
@@ -60,7 +74,7 @@ class _PortfoyEkraniState extends ConsumerState<PortfoyEkrani> {
             );
           }
 
-          final sirali = _sirala(hisseler);
+          final islenmis = _isle(hisseler);
           final toplamDeger =
               hisseler.fold(0.0, (t, h) => t + h.toplamDeger);
           final toplamMaliyet =
@@ -118,7 +132,30 @@ class _PortfoyEkraniState extends ConsumerState<PortfoyEkrani> {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: TextField(
+                      controller: _aramaKontrolcu,
+                      onChanged: (v) =>
+                          setState(() => _aramaMetni = v),
+                      decoration: InputDecoration(
+                        hintText: 'Sembol veya şirket ara...',
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: _aramaMetni.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _aramaKontrolcu.clear();
+                                  setState(() => _aramaMetni = '');
+                                },
+                              )
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
                     child: Row(
                       children: [
                         const Text('Sırala:',
@@ -128,8 +165,8 @@ class _PortfoyEkraniState extends ConsumerState<PortfoyEkrani> {
                         _SiralamaChip(
                           baslik: 'Değer',
                           secili: _siralama == _Siralama.deger,
-                          onTap: () =>
-                              setState(() => _siralama = _Siralama.deger),
+                          onTap: () => setState(
+                              () => _siralama = _Siralama.deger),
                         ),
                         const SizedBox(width: 6),
                         _SiralamaChip(
@@ -146,22 +183,45 @@ class _PortfoyEkraniState extends ConsumerState<PortfoyEkrani> {
                               setState(() => _siralama = _Siralama.ad),
                         ),
                         const Spacer(),
-                        Text('${hisseler.length} hisse',
-                            style: const TextStyle(
-                                color: Color(0xFF6B7280), fontSize: 12)),
+                        Text(
+                          '${islenmis.length}/${hisseler.length}',
+                          style: const TextStyle(
+                              color: Color(0xFF6B7280), fontSize: 12),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, i) => _HisseSatiri(hisse: sirali[i]),
-                      childCount: sirali.length,
-                    ),
-                  ),
-                ),
+                islenmis.isEmpty
+                    ? SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.search_off,
+                                  size: 52,
+                                  color: Colors.grey.shade300),
+                              const SizedBox(height: 12),
+                              Text(
+                                '"$_aramaMetni" bulunamadı',
+                                style: const TextStyle(
+                                    color: Color(0xFF6B7280)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : SliverPadding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16, 4, 16, 80),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, i) =>
+                                _HisseSatiri(hisse: islenmis[i]),
+                            childCount: islenmis.length,
+                          ),
+                        ),
+                      ),
               ],
             ),
           );
@@ -200,14 +260,17 @@ class _SiralamaChip extends StatelessWidget {
   final VoidCallback onTap;
 
   const _SiralamaChip(
-      {required this.baslik, required this.secili, required this.onTap});
+      {required this.baslik,
+      required this.secili,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: secili
               ? const Color(0xFF3949AB)
@@ -219,7 +282,8 @@ class _SiralamaChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: secili ? Colors.white : const Color(0xFF3949AB),
+            color:
+                secili ? Colors.white : const Color(0xFF3949AB),
           ),
         ),
       ),
@@ -280,7 +344,8 @@ class _HisseSatiri extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(hisse.sirketAdi,
                         style: const TextStyle(
-                            fontSize: 12, color: Color(0xFF6B7280))),
+                            fontSize: 12,
+                            color: Color(0xFF6B7280))),
                     const SizedBox(height: 4),
                     Text(
                       '${hisse.adet} adet  ·  Alış: ₺${hisse.alisFiyati.toStringAsFixed(2)}',
@@ -305,8 +370,10 @@ class _HisseSatiri extends StatelessWidget {
                         horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: kar
-                          ? const Color(0xFF4CAF50).withValues(alpha: 0.12)
-                          : const Color(0xFFEF5350).withValues(alpha: 0.12),
+                          ? const Color(0xFF4CAF50)
+                              .withValues(alpha: 0.12)
+                          : const Color(0xFFEF5350)
+                              .withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
