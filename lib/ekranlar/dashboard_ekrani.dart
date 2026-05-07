@@ -359,8 +359,10 @@ class _SonHareketler extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (liste.isEmpty) return Card(child: Padding(padding: const EdgeInsets.all(20),
-        child: Center(child: Text('Henüz hareket yok', style: TextStyle(color: Colors.grey.shade500)))));
+    if (liste.isEmpty) {
+      return Card(child: Padding(padding: const EdgeInsets.all(20),
+          child: Center(child: Text('Henüz hareket yok', style: TextStyle(color: Colors.grey.shade500)))));
+    }
     final son3 = liste.take(3).toList();
     return Card(child: Column(children: List.generate(son3.length, (i) {
       final log = son3[i];

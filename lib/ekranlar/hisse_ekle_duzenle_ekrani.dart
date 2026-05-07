@@ -68,8 +68,11 @@ class _HisseEkleDuzenleEkraniState extends ConsumerState<HisseEkleDuzenleEkrani>
       alisTarihi: _secilenTarih,
     );
     try {
-      if (_duzenlemeModunda) await servis.hisseDuzenle(yeniHisse);
-      else await servis.hisseEkle(yeniHisse);
+      if (_duzenlemeModunda) {
+        await servis.hisseDuzenle(yeniHisse);
+      } else {
+        await servis.hisseEkle(yeniHisse);
+      }
       if (mounted) { Navigator.pop(context); }
     } catch (e) {
       if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'))); }
